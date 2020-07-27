@@ -24,5 +24,14 @@ def load_data(nrows):
 
 data=load_data(3000)
 original_data = data
-st.write(data.columns)
+# st.write(data.columns)
+
+st.header("Where are most people injured?")
+injured_people = st.slider("Number of people injured in vehicle collision", 0, 19)
+st.map(data.query("number_of_persons_injured >= @injured_people")[["latitude", "longitude"]].dropna(how="any"))
+
+st.header("How many collisions occur during a particular hour?")
+hour = st.slider("Hour to look at ", 0, 23)
+data = data[data['date/time'].dt.hour==hour]
+st.markdown(f"Collisions between {hour}:00 and {hour+1}:00")
 
