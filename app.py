@@ -35,3 +35,42 @@ hour = st.slider("Hour to look at ", 0, 23)
 data = data[data['date/time'].dt.hour==hour]
 st.markdown(f"Collisions between {hour}:00 and {hour+1}:00")
 
+midpoint = (np.average(data["latitude"]), np.average(data["longitude"]))
+
+st.write(pdk.Deck(
+    map_style = "mapbox://styles/mapbox/light-v9",
+    initial_view_state={
+        "latitude": midpoint[0],
+        "longitude": midpoint[1],
+        "zoom": 11,
+        "pitch": 55,
+    },
+
+    layers = [
+        pdk.Layer(
+        'HexagonLayer',
+        data=data[["date/time", "latitude", "longitude"]],
+        get_position=['longitude',"latitude,"],
+        auto_highlight=True,
+        radius=100,
+        extruded=True,
+        pickable=True,
+        elevation_scale=4,
+        elevation_range=[0, 1000],
+
+    )]
+))
+
+if st.checkbox('Show RAW data', False):
+    st.subheader("Raw data by minute between %i:00 and %i:00" % (hour, (hour + 1) % 24))
+    st.write(data)
+
+
+st.subheader(f"Breakdown by minute bewtween {hour}:00 and {hour+1}:00")
+filtered = data[
+    (data["date/time"].dt.hour >= hour) & (data["date/time"].dt.hour < (hour + 1))
+]   
+hist = np.histogram(filtered["date/time"].dt.minute, bins=60, range=[0,60])[0]
+chart_data = pd.DataFrame({"minute": range(60), "crashes": hist})
+fig = px.bar(chart_data, x='minute', y='crashes', hover_data=['minute', 'crashes'], height=400)
+st.write(fig)
