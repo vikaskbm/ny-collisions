@@ -3,8 +3,13 @@ import pandas as pd
 import numpy as np
 import pydeck as pdk
 import plotly.express as px
+import os
+from urllib.request import urlretrieve
 
-DATA_URL = 'collisions.csv.csv'
+DATA_URL = 'Motor_Vehicle_Collisions_-_Crashes.csv'
+
+if not os.path.isfile(DATA_URL):
+    urlretrieve('https://data.cityofnewyork.us/api/views/h9gi-nx95/rows.csv?accessType=DOWNLOAD')
 
 st.title('New York Vehicle Collision Analysis')
 st.markdown('This web app is a streamlit dashboard to analyse and plot motor vehicle collision data')
